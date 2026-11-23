@@ -1,0 +1,15 @@
+# Dependencies & local build artifacts
+node_modules/
+npm-debug.log*
+.tmp_*
+
+# Environment variables & secrets (never commit API keys!)
+.env
+.env.*
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

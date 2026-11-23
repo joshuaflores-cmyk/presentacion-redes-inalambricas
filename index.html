@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#030712" />
+  <title>Vulnerabilidades en los servicios y seguridad en redes inalámbricas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#presentation">Ir al contenido principal</a>
+
+  <!-- Fixed 3D Video-to-Frames Background Stage -->
+  <div class="video-stage" aria-hidden="true">
+    <img id="lcp-poster" src="assets/frames/frame_0001.webp" alt="" width="1280" height="720" fetchpriority="high" />
+    <canvas id="video-canvas"></canvas>
+    <div class="stage-scrim"></div>
+    <div class="stage-grid-overlay"></div>
+  </div>
+
+  <!-- Top Scroll Progress Bar -->
+  <div class="scroll-progress-track" aria-hidden="true">
+    <div id="scroll-progress-bar"></div>
+  </div>
+
+  <!-- Minimal Floating Presentation HUD -->
+  <header class="hud-bar">
+    <div class="hud-brand">
+      <div class="hud-pill" aria-live="polite">
+        <span class="hud-live-dot" aria-hidden="true"></span>
+        <span id="hud-counter">PORTADA</span>
+      </div>
+      <span id="frame-loader-status" class="hud-frame-loader" aria-hidden="true">Frames 0%</span>
+    </div>
+
+    <div class="hud-controls">
+      <button type="button" id="btn-pause-anim" class="hud-btn" title="Pausar o reanudar animaciones (Tecla P)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+          <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+        </svg>
+        <span class="btn-label" id="pause-btn-label">Pausar animaciones</span>
+      </button>
+      <button type="button" id="btn-outline" class="hud-btn" title="Abrir índice de diapositivas (Tecla M)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <circle cx="4" cy="6" r="1"></circle>
+          <circle cx="4" cy="12" r="1"></circle>
+          <circle cx="4" cy="18" r="1"></circle>
+        </svg>
+        <span class="btn-label">Índice</span>
+      </button>
+      <button type="button" id="btn-fullscreen" class="hud-btn" title="Pantalla completa (Tecla F)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <polyline points="9 21 3 21 3 15"></polyline>
+          <line x1="21" y1="3" x2="14" y2="10"></line>
+          <line x1="3" y1="21" x2="10" y2="14"></line>
+        </svg>
+        <span class="btn-label">Pantalla completa</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Right Vertical Navigation Rail (12 stops = Landing + 11 scrolls) -->
+  <nav class="slide-nav" aria-label="Navegación de diapositivas">
+    <ul>
+      <li><a href="#slide-0" aria-current="location" aria-label="Portada"><span class="nav-tooltip">Portada</span></a></li>
+      <li><a href="#slide-1" aria-label="1. Introducción"><span class="nav-tooltip">01 · Introducción</span></a></li>
+      <li><a href="#slide-2" aria-label="2. ¿Qué son las vulnerabilidades?"><span class="nav-tooltip">02 · Vulnerabilidades de red</span></a></li>
+      <li><a href="#slide-3" aria-label="3. Acceso y configuración"><span class="nav-tooltip">03 · Acceso y configuración</span></a></li>
+      <li><a href="#slide-4" aria-label="4. Sistemas y datos"><span class="nav-tooltip">04 · Sistemas y cifrado</span></a></li>
+      <li><a href="#slide-5" aria-label="5. Seguridad en redes inalámbricas"><span class="nav-tooltip">05 · Seguridad inalámbrica</span></a></li>
+      <li><a href="#slide-6" aria-label="6. Amenazas de acceso e intercepción"><span class="nav-tooltip">06 · Amenazas e intercepción</span></a></li>
+      <li><a href="#slide-7" aria-label="7. Interrupción y fuerza bruta"><span class="nav-tooltip">07 · Deauth, Fuerza Bruta y DoS</span></a></li>
+      <li><a href="#slide-8" aria-label="8. Protocolos de seguridad Wi-Fi"><span class="nav-tooltip">08 · Protocolos WEP → WPA3</span></a></li>
+      <li><a href="#slide-9" aria-label="9. Medidas de prevención"><span class="nav-tooltip">09 · Prevención y defensa</span></a></li>
+      <li><a href="#slide-10" aria-label="10. Importancia en empresas"><span class="nav-tooltip">10 · Empresas y organizaciones</span></a></li>
+      <li><a href="#slide-11" aria-label="Conclusión"><span class="nav-tooltip">Conclusión</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- Bottom Quick Slide Stepper -->
+  <div class="slide-arrows" aria-label="Controles de avance">
+    <button type="button" id="btn-prev" class="arrow-btn" aria-label="Diapositiva anterior" title="Anterior (↑)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+    <button type="button" id="btn-next" class="arrow-btn" aria-label="Siguiente diapositiva" title="Siguiente (↓)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ========================================================================
+       MAIN PRESENTATION SCROLLER (Landing + 11 Scrolls)
+       ======================================================================== -->
+  <main id="presentation" tabindex="0" aria-label="Presentación interactiva sobre vulnerabilidades en los servicios y seguridad en redes inalámbricas">
+
+    <!-- ======================================================================
+         LANDING (0 SCROLLS): PORTADA
+         ====================================================================== -->
+    <section id="slide-0" class="slide slide-hero is-active" data-index="0" data-label="PORTADA" data-theme="cyan">
+      <div class="slide-inner">
+        <div class="hero-layout">
+          <span class="hero-badge">Ciberseguridad · Redes Inalámbricas</span>
+          <h1 class="hero-title" tabindex="-1">
+            Vulnerabilidades en los servicios y <span class="gradient-text">seguridad en redes inalámbricas</span>
+          </h1>
+          <p class="hero-subtitle">
+            Riesgos en servicios de red, principales ataques sobre Wi-Fi, evolución de los protocolos de cifrado y estrategias integrales de protección.
+          </p>
+
+          <div class="authors-panel">
+            <span class="authors-label">Integrantes</span>
+            <div class="author-chip">
+              <span class="author-avatar" aria-hidden="true">JF</span>
+              <span>Joshua Flores</span>
+            </div>
+            <span class="author-divider" aria-hidden="true"></span>
+            <div class="author-chip">
+              <span class="author-avatar" aria-hidden="true">RM</span>
+              <span>Rogelio Miranda</span>
+            </div>
+          </div>
+
+          <div class="hero-cta-row">
+            <button type="button" class="btn-primary" data-goto="1">
+              <span>Iniciar presentación</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+            </button>
+            <div class="scroll-cue">
+              <span class="scroll-mouse" aria-hidden="true"></span>
+              <span>Desliza o usa las flechas · 11 scrolls</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 1 — DIAPOSITIVA 1: INTRODUCCIÓN
+         ====================================================================== -->
+    <section id="slide-1" class="slide" data-index="1" data-label="01 / 11 · INTRODUCCIÓN" data-theme="cyan">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">01 · Introducción</span>
+          <h2 class="slide-title" tabindex="-1">Conectividad sin cables, exposición constante</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+              </span>
+              <div class="point-body"><strong>Presencia universal:</strong> Wi-Fi conecta computadoras, móviles, impresoras y equipos en hogares, empresas, escuelas y hospitales.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+              </span>
+              <div class="point-body"><strong>Riesgo de radiofrecuencia:</strong> las señales viajan por el aire y pueden ser detectadas por cualquier atacante dentro de su alcance.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <div class="point-body"><strong>Objetivo de la seguridad:</strong> preservar la <strong>Confidencialidad</strong>, <strong>Integridad</strong> y <strong>Disponibilidad</strong> de los datos frente a fallas y ataques.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Diagrama dinámico · Alcance RF &amp; Tríada CIA</span>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 320" role="img" aria-label="Diagrama animado de ondas Wi-Fi atravesando el perímetro y la tríada CIA">
+              <defs>
+                <radialGradient id="rfGlow1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- Left side: RF perimeter -->
+              <rect x="24" y="34" width="236" height="252" rx="16" fill="rgba(14,26,52,0.55)" stroke="#38bdf8" stroke-opacity="0.35" stroke-dasharray="6 5"/>
+              <text x="142" y="58" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="10">PERÍMETRO FÍSICO</text>
+
+              <!-- Expanding RF waves leaking beyond walls -->
+              <circle cx="142" cy="162" r="78" fill="url(#rfGlow1)"/>
+              <circle class="anim-rf" cx="142" cy="162" r="72" fill="none" stroke="#38bdf8" stroke-width="2"/>
+              <circle class="anim-rf-2" cx="142" cy="162" r="72" fill="none" stroke="#818cf8" stroke-width="1.8"/>
+              <circle class="anim-rf-3" cx="142" cy="162" r="72" fill="none" stroke="#fb7185" stroke-width="1.5"/>
+
+              <!-- Central AP -->
+              <circle cx="142" cy="162" r="22" fill="#0c1e3a" stroke="#38bdf8" stroke-width="2.2"/>
+              <text x="142" y="166" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700">Wi-Fi</text>
+
+              <!-- Connected devices inside -->
+              <g>
+                <rect x="50" y="88" width="54" height="28" rx="6" fill="#0f1f3d" stroke="#38bdf8" stroke-opacity="0.6"/>
+                <text x="77" y="106" text-anchor="middle" fill="#cbd5e1" font-size="10">Laptop</text>
+                <line class="anim-dash" x1="104" y1="112" x2="126" y2="144" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="5 5"/>
+              </g>
+              <g>
+                <rect x="180" y="92" width="56" height="28" rx="6" fill="#0f1f3d" stroke="#38bdf8" stroke-opacity="0.6"/>
+                <text x="208" y="110" text-anchor="middle" fill="#cbd5e1" font-size="10">Móvil</text>
+                <line class="anim-dash" x1="184" y1="118" x2="158" y2="144" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="5 5"/>
+              </g>
+              <g>
+                <rect x="78" y="232" width="128" height="28" rx="6" fill="#0f1f3d" stroke="#818cf8" stroke-opacity="0.6"/>
+                <text x="142" y="250" text-anchor="middle" fill="#cbd5e1" font-size="10">Hogar · Empresa · Salud</text>
+                <line class="anim-dash" x1="142" y1="232" x2="142" y2="184" stroke="#818cf8" stroke-width="1.6" stroke-dasharray="5 5"/>
+              </g>
+
+              <!-- External exposure callout -->
+              <rect x="272" y="242" width="90" height="36" rx="8" fill="rgba(244,63,94,0.16)" stroke="#fb7185" stroke-width="1.3"/>
+              <text x="317" y="257" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">SEÑAL EXTERNA</text>
+              <text x="317" y="270" text-anchor="middle" fill="#cbd5e1" font-size="9">Riesgo de escucha</text>
+
+              <!-- Right side: CIA Triad Orbital -->
+              <g transform="translate(432, 145)">
+                <circle class="anim-spin-slow" cx="0" cy="0" r="88" fill="none" stroke="#38bdf8" stroke-opacity="0.28" stroke-width="1.5" stroke-dasharray="8 6"/>
+                <polygon points="0,-68 62,42 -62,42" fill="rgba(56,189,248,0.08)" stroke="#38bdf8" stroke-width="2" stroke-dasharray="7 5" class="anim-dash"/>
+                <circle cx="0" cy="4" r="24" fill="#08162d" stroke="#10b981" stroke-width="1.8"/>
+                <text x="0" y="8" text-anchor="middle" fill="#f8fafc" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700">CIA</text>
+
+                <!-- 3 Pillars -->
+                <g transform="translate(0, -76)">
+                  <rect x="-56" y="-14" width="112" height="28" rx="14" fill="#0c203e" stroke="#38bdf8" stroke-width="1.5"/>
+                  <text x="0" y="4" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Confidencialidad</text>
+                </g>
+                <g transform="translate(56, 52)">
+                  <rect x="-46" y="-14" width="92" height="28" rx="14" fill="#131c42" stroke="#818cf8" stroke-width="1.5"/>
+                  <text x="0" y="4" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Integridad</text>
+                </g>
+                <g transform="translate(-56, 52)">
+                  <rect x="-50" y="-14" width="100" height="28" rx="14" fill="#092927" stroke="#10b981" stroke-width="1.5"/>
+                  <text x="0" y="4" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Disponibilidad</text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <p class="diagram-caption">
+            <span>Las ondas RF sobrepasan muros físicos; por eso la seguridad busca resguardar la tríada CIA.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 2 — DIAPOSITIVA 2: ¿QUÉ SON LAS VULNERABILIDADES EN SERVICIOS DE RED?
+         ====================================================================== -->
+    <section id="slide-2" class="slide" data-index="2" data-label="02 / 11 · VULNERABILIDADES DE RED" data-theme="amber">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">02 · Concepto fundamental</span>
+          <h2 class="slide-title" tabindex="-1">¿Qué son las vulnerabilidades en los servicios de red?</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </span>
+              <div class="point-body"><strong>Definición:</strong> es una debilidad o falla en servidores, routers, puntos de acceso, protocolos o configuraciones explotable sin autorización.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <div class="point-body"><strong>No solo fallas técnicas:</strong> surgen también por <strong>errores humanos</strong>, falta de mantenimiento, desconocimiento o equipos obsoletos.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </span>
+              <div class="point-body"><strong>Consecuencias críticas:</strong> robo de información, acceso indebido, alteración de archivos, malware, suplantación, caída de servicios y daño reputacional.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Diagrama dinámico · Cadena Causa → Brecha → Impacto</span>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 320" role="img" aria-label="Flujo animado desde las causas hacia la brecha del servicio y sus consecuencias">
+              <!-- Column labels -->
+              <text x="86" y="28" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">ORIGEN</text>
+              <text x="276" y="28" text-anchor="middle" fill="#fb7185" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">BRECHA</text>
+              <text x="466" y="28" text-anchor="middle" fill="#f43f5e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">CONSECUENCIAS</text>
+
+              <!-- Animated flow paths left -> center -->
+              <path class="anim-dash" d="M 152 80 C 195 80, 200 156, 232 156" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 5"/>
+              <path class="anim-dash" d="M 152 162 L 232 162" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 5"/>
+              <path class="anim-dash" d="M 152 244 C 195 244, 200 168, 232 168" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 5"/>
+
+              <!-- Animated flow paths center -> right -->
+              <path class="anim-dash-fast" d="M 320 148 C 352 148, 355 66, 392 66" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="5 5"/>
+              <path class="anim-dash-fast" d="M 320 154 C 352 154, 355 114, 392 114" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="5 5"/>
+              <path class="anim-dash-fast" d="M 320 162 L 392 162" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="5 5"/>
+              <path class="anim-dash-fast" d="M 320 170 C 352 170, 355 210, 392 210" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="5 5"/>
+              <path class="anim-dash-fast" d="M 320 176 C 352 176, 355 258, 392 258" fill="none" stroke="#fb7185" stroke-width="1.8" stroke-dasharray="5 5"/>
+
+              <!-- Left: 3 Origins -->
+              <g transform="translate(20, 56)">
+                <rect width="132" height="48" rx="10" fill="#18192b" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="66" y="22" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="700">Fallas técnicas</text>
+                <text x="66" y="37" text-anchor="middle" fill="#94a3b8" font-size="9.5">Protocolos · Apps</text>
+              </g>
+              <g transform="translate(20, 138)">
+                <rect width="132" height="48" rx="10" fill="#18192b" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="66" y="22" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="700">Errores humanos</text>
+                <text x="66" y="37" text-anchor="middle" fill="#94a3b8" font-size="9.5">Claves · Descuido</text>
+              </g>
+              <g transform="translate(20, 220)">
+                <rect width="132" height="48" rx="10" fill="#18192b" stroke="#f59e0b" stroke-width="1.5"/>
+                <text x="66" y="22" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="700">Sin mantenimiento</text>
+                <text x="66" y="37" text-anchor="middle" fill="#94a3b8" font-size="9.5">Equipos obsoletos</text>
+              </g>
+
+              <!-- Center: Breached service node -->
+              <g transform="translate(276, 162)">
+                <circle class="anim-pulse" r="52" fill="rgba(251,113,133,0.12)" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="8 5"/>
+                <polygon points="0,-38 35,-18 35,18 0,38 -35,18 -35,-18" fill="#211022" stroke="#f59e0b" stroke-width="2"/>
+                <text x="0" y="-4" text-anchor="middle" fill="#fde68a" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">SERVICIO</text>
+                <text x="0" y="11" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="9.5">VULNERABLE</text>
+              </g>
+
+              <!-- Right: 5 Consequences -->
+              <g transform="translate(392, 48)">
+                <rect width="148" height="34" rx="8" fill="#220f1e" stroke="#fb7185" stroke-opacity="0.75"/>
+                <text x="74" y="21" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Robo de información</text>
+              </g>
+              <g transform="translate(392, 96)">
+                <rect width="148" height="34" rx="8" fill="#220f1e" stroke="#fb7185" stroke-opacity="0.75"/>
+                <text x="74" y="21" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Acceso no autorizado</text>
+              </g>
+              <g transform="translate(392, 144)">
+                <rect width="148" height="34" rx="8" fill="#220f1e" stroke="#fb7185" stroke-opacity="0.75"/>
+                <text x="74" y="21" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Malware y alteración</text>
+              </g>
+              <g transform="translate(392, 192)">
+                <rect width="148" height="34" rx="8" fill="#220f1e" stroke="#fb7185" stroke-opacity="0.75"/>
+                <text x="74" y="21" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Caída de servicios</text>
+              </g>
+              <g transform="translate(392, 240)">
+                <rect width="148" height="34" rx="8" fill="#220f1e" stroke="#fb7185" stroke-opacity="0.75"/>
+                <text x="74" y="21" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Suplantación y pérdidas</text>
+              </g>
+            </svg>
+          </div>
+          <p class="diagram-caption">
+            <span>Ejemplo común: una contraseña simple o la clave predeterminada de un router basta para perder el control de la red.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 3 — DIAPOSITIVA 3: VULNERABILIDADES DE ACCESO Y CONFIGURACIÓN
+         ====================================================================== -->
+    <section id="slide-3" class="slide" data-index="3" data-label="03 / 11 · ACCESO Y CONFIGURACIÓN" data-theme="amber">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">03 · Vulnerabilidades frecuentes (Parte 1)</span>
+          <h2 class="slide-title" tabindex="-1">Acceso débil, malas configuraciones y permisos abiertos</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              </span>
+              <div class="point-body"><strong>Contraseñas débiles:</strong> fechas, nombres o secuencias caen rápido ante herramientas automatizadas; requieren claves largas y <strong>MFA</strong>.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg>
+              </span>
+              <div class="point-body"><strong>Configuraciones incorrectas:</strong> credenciales de fábrica, funciones innecesarias, administración expuesta a Internet o visitantes en la red interna.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+              </span>
+              <div class="point-body"><strong>Falta de control de acceso:</strong> sin cuentas individuales ni permisos por rol, cualquiera puede acceder a recursos restringidos.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Simulador interactivo · Autenticación y Compuertas</span>
+            <div class="visual-tabs" role="tablist" aria-label="Modo de autenticación">
+              <button type="button" class="tab-btn is-selected" data-pw-mode="weak">Clave débil</button>
+              <button type="button" class="tab-btn" data-pw-mode="strong">Clave robusta + MFA</button>
+            </div>
+          </div>
+          <div class="diagram-box">
+            <svg id="svg-access-sim" class="diagram-svg" viewBox="0 0 560 205" role="img" aria-label="Simulador visual de vulnerabilidad de contraseñas y control de acceso">
+              <!-- Attacker node -->
+              <rect x="24" y="54" width="118" height="86" rx="12" fill="#231020" stroke="#fb7185" stroke-width="1.6"/>
+              <text x="83" y="84" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">BOT DE PRUEBAS</text>
+              <text id="pw-try-text" x="83" y="106" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="12">12345678</text>
+              <text id="pw-rate-text" x="83" y="124" text-anchor="middle" fill="#94a3b8" font-size="9">Miles de intentos/s</text>
+
+              <!-- Animated attack stream -->
+              <line id="pw-beam-1" class="anim-dash-fast" x1="142" y1="97" x2="250" y2="97" stroke="#f59e0b" stroke-width="3" stroke-dasharray="8 6"/>
+
+              <!-- Center Gate / Lock -->
+              <g transform="translate(290, 97)">
+                <circle id="pw-ring" class="anim-spin" r="42" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10 6"/>
+                <circle id="pw-core" r="30" fill="#1d1424" stroke="#f59e0b" stroke-width="2.2"/>
+                <text id="pw-status-icon" x="0" y="-2" text-anchor="middle" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700">ABIERTO</text>
+                <text id="pw-status-sub" x="0" y="13" text-anchor="middle" fill="#cbd5e1" font-size="9">Sin MFA</text>
+              </g>
+
+              <!-- Stream to network -->
+              <line id="pw-beam-2" class="anim-dash-fast" x1="332" y1="97" x2="418" y2="97" stroke="#fb7185" stroke-width="3" stroke-dasharray="8 6"/>
+
+              <!-- Protected Network Target -->
+              <rect id="pw-target-box" x="418" y="54" width="118" height="86" rx="12" fill="#24101f" stroke="#fb7185" stroke-width="1.8"/>
+              <text x="477" y="86" text-anchor="middle" fill="#f8fafc" font-family="Space Grotesk, sans-serif" font-size="12" font-weight="700">Red Interna</text>
+              <text id="pw-result-text" x="477" y="108" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">COMPROMETIDA</text>
+              <text id="pw-time-text" x="477" y="125" text-anchor="middle" fill="#94a3b8" font-size="9">Acceso en segundos</text>
+
+              <!-- Bottom indicator label -->
+              <text x="280" y="186" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="10">HAZ CLIC EN LAS COMPUERTAS PARA CORREGIR CONFIGURACIONES:</text>
+            </svg>
+
+            <div class="gate-grid">
+              <button type="button" class="gate-toggle" data-gate>
+                <span class="gate-title">Router de fábrica</span>
+                <span class="gate-state" data-off="⚠ admin / admin" data-on="✓ Credencial única">⚠ admin / admin</span>
+              </button>
+              <button type="button" class="gate-toggle" data-gate>
+                <span class="gate-title">Panel en Internet</span>
+                <span class="gate-state" data-off="⚠ Expuesto (WAN)" data-on="✓ Solo red local">⚠ Expuesto (WAN)</span>
+              </button>
+              <button type="button" class="gate-toggle" data-gate>
+                <span class="gate-title">Control por rol</span>
+                <span class="gate-state" data-off="⚠ Acceso libre" data-on="✓ Cuentas y permisos">⚠ Acceso libre</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 4 — DIAPOSITIVA 4: VULNERABILIDADES EN SISTEMAS Y DATOS
+         ====================================================================== -->
+    <section id="slide-4" class="slide" data-index="4" data-label="04 / 11 · SISTEMAS Y CIFRADO" data-theme="amber">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">04 · Vulnerabilidades frecuentes (Parte 2)</span>
+          <h2 class="slide-title" tabindex="-1">Sistemas desactualizados y comunicaciones sin cifrar</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              </span>
+              <div class="point-body"><strong>Firmware y software antiguos:</strong> un router o servidor sin parches conserva fallas públicas que permiten tomar el control de la red.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </span>
+              <div class="point-body"><strong>Falta de cifrado:</strong> sin encriptación, terceros pueden leer contraseñas, datos financieros y documentos en tránsito.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <div class="point-body"><strong>Respuesta esencial:</strong> instalar actualizaciones oficiales, sustituir equipos sin soporte y exigir <strong>WPA2-AES / WPA3 + HTTPS</strong>.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Simulador en vivo · Canal de Datos &amp; Parches</span>
+            <div class="visual-tabs" role="tablist" aria-label="Estado del cifrado">
+              <button type="button" class="tab-btn is-selected" data-enc-mode="plain">Sin cifrar</button>
+              <button type="button" class="tab-btn" data-enc-mode="cipher">WPA3 + HTTPS</button>
+            </div>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 300" role="img" aria-label="Comparativa animada entre tráfico sin cifrar interceptable y túnel cifrado WPA3 más HTTPS">
+              <!-- Tunnel background -->
+              <rect id="enc-tunnel" x="128" y="66" width="304" height="72" rx="36" fill="rgba(245,158,11,0.10)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8 6"/>
+              <text id="enc-tunnel-label" x="280" y="54" text-anchor="middle" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="700">CANAL EXPUESTO (TEXTO PLANO)</text>
+
+              <!-- Moving packet line -->
+              <line id="enc-flow-line" class="anim-dash-fast" x1="126" y1="102" x2="434" y2="102" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="9 7"/>
+
+              <!-- Floating packet badge -->
+              <g class="anim-bob">
+                <rect id="enc-packet-bg" x="206" y="84" width="148" height="36" rx="8" fill="#231618" stroke="#f59e0b" stroke-width="1.6"/>
+                <text id="enc-packet-text" x="280" y="106" text-anchor="middle" fill="#fde68a" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700">clave=MiBanco24</text>
+              </g>
+
+              <!-- Sender & Receiver -->
+              <rect x="22" y="68" width="104" height="68" rx="12" fill="#0d1b34" stroke="#38bdf8" stroke-width="1.6"/>
+              <text x="74" y="98" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Usuario</text>
+              <text x="74" y="116" text-anchor="middle" fill="#94a3b8" font-size="9.5">Dispositivo</text>
+
+              <rect x="434" y="68" width="104" height="68" rx="12" fill="#0d1b34" stroke="#38bdf8" stroke-width="1.6"/>
+              <text x="486" y="98" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Servidor</text>
+              <text x="486" y="116" text-anchor="middle" fill="#94a3b8" font-size="9.5">Sitio Web</text>
+
+              <!-- Interceptor tapping below -->
+              <line id="enc-tap-line" class="anim-dash-fast" x1="280" y1="138" x2="280" y2="188" stroke="#fb7185" stroke-width="2" stroke-dasharray="5 5"/>
+              <rect id="enc-sniffer-box" x="180" y="188" width="200" height="44" rx="10" fill="#25101e" stroke="#fb7185" stroke-width="1.6"/>
+              <text id="enc-sniffer-title" x="280" y="207" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">TERCERO INTERCEPTANDO</text>
+              <text id="enc-sniffer-out" x="280" y="223" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="10">Lee: "clave=MiBanco24"</text>
+
+              <!-- Firmware status bar at bottom -->
+              <rect x="24" y="248" width="512" height="36" rx="9" fill="rgba(15,25,48,0.75)" stroke="rgba(148,163,184,0.22)"/>
+              <text x="38" y="270" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="10">FIRMWARE DEL ROUTER:</text>
+              <rect id="fw-bar-bg" x="190" y="261" width="180" height="10" rx="5" fill="rgba(148,163,184,0.2)"/>
+              <rect id="fw-bar-fill" x="190" y="261" width="46" height="10" rx="5" fill="#f59e0b"/>
+              <text id="fw-status-text" x="382" y="270" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">v1.4 · Obsoleto (CVEs)</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 5 — DIAPOSITIVA 5: SEGURIDAD EN LAS REDES INALÁMBRICAS
+         ====================================================================== -->
+    <section id="slide-5" class="slide" data-index="5" data-label="05 / 11 · SEGURIDAD INALÁMBRICA" data-theme="teal">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">05 · Fundamentos Wi-Fi</span>
+          <h2 class="slide-title" tabindex="-1">Seguridad integral en redes IEEE 802.11</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+              </span>
+              <div class="point-body"><strong>Estándar IEEE 802.11 (Wi-Fi):</strong> transmite datos mediante ondas de radio para ofrecer conectividad flexible y movilidad continua.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="4"/></svg>
+              </span>
+              <div class="point-body"><strong>Desafío del alcance:</strong> la señal inalámbrica puede extenderse fuera de la oficina, aula o vivienda, ampliando la superficie de exposición.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              </span>
+              <div class="point-body"><strong>Enfoque NIST (SP 800-153):</strong> no basta proteger el router; hay que asegurar <strong>puntos de acceso</strong>, <strong>dispositivos clientes</strong> y la <strong>administración</strong>.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Modelo NIST · Protección de extremo a extremo</span>
+          </div>
+          <div class="studio-thumb-wrap">
+            <img src="assets/images/wifi_architecture.webp" alt="Ilustración 3D de un edificio con señal Wi-Fi IEEE 802.11 sobrepasando el perímetro" width="960" height="540" loading="lazy" />
+            <div class="studio-thumb-caption">
+              <span>IEEE 802.11 · Cobertura sin fronteras físicas</span>
+              <span>NIST SP 800-153</span>
+            </div>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 175" role="img" aria-label="Triángulo de protección integral NIST entre puntos de acceso, clientes y administración">
+              <line class="anim-dash" x1="145" y1="88" x2="225" y2="88" stroke="#38bdf8" stroke-width="2.2" stroke-dasharray="6 5"/>
+              <line class="anim-dash" x1="335" y1="88" x2="415" y2="88" stroke="#14b8a6" stroke-width="2.2" stroke-dasharray="6 5"/>
+              <path class="anim-dash-rev" d="M 476 126 C 420 162, 140 162, 84 126" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-dasharray="6 5"/>
+
+              <g transform="translate(24, 48)">
+                <rect width="122" height="78" rx="12" fill="#0b1d36" stroke="#38bdf8" stroke-width="1.7"/>
+                <text x="61" y="34" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">CAPA 1</text>
+                <text x="61" y="53" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Puntos de Acceso</text>
+                <text x="61" y="68" text-anchor="middle" fill="#94a3b8" font-size="9">Routers · Antenas</text>
+              </g>
+              <g transform="translate(220, 48)">
+                <rect width="120" height="78" rx="12" fill="#0b2434" stroke="#14b8a6" stroke-width="1.7"/>
+                <text x="60" y="34" text-anchor="middle" fill="#2dd4bf" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">CAPA 2</text>
+                <text x="60" y="53" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Clientes</text>
+                <text x="60" y="68" text-anchor="middle" fill="#94a3b8" font-size="9">PC · Móviles · IoT</text>
+              </g>
+              <g transform="translate(414, 48)">
+                <rect width="122" height="78" rx="12" fill="#141b3d" stroke="#818cf8" stroke-width="1.7"/>
+                <text x="61" y="34" text-anchor="middle" fill="#a5b4fc" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">CAPA 3</text>
+                <text x="61" y="53" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Administración</text>
+                <text x="61" y="68" text-anchor="middle" fill="#94a3b8" font-size="9">Políticas · Control</text>
+              </g>
+              <text x="280" y="24" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="10">SI FALLA UN ESLABÓN, TODA LA RED QUEDA EXPUESTA</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 6 — DIAPOSITIVA 6: AMENAZAS DE ACCESO E INTERCEPCIÓN EN WI-FI
+         ====================================================================== -->
+    <section id="slide-6" class="slide" data-index="6" data-label="06 / 11 · AMENAZAS E INTERCEPCIÓN" data-theme="crimson">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">06 · Ataques en redes inalámbricas (Parte 1)</span>
+          <h2 class="slide-title" tabindex="-1">Amenazas de acceso, engaño e intercepción</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              </span>
+              <div class="point-body"><strong>Redes Wi-Fi abiertas:</strong> permiten conectarse sin contraseña, exponiendo tráfico no cifrado en espacios públicos.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+              </span>
+              <div class="point-body"><strong>Rogue Access Point:</strong> punto de acceso falso con nombre similar a una red legítima para atraer víctimas y capturar tráfico.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+              </span>
+              <div class="point-body"><strong>Man-in-the-Middle (MitM):</strong> el atacante se interpone entre dos dispositivos para leer o alterar credenciales y datos.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </span>
+              <div class="point-body"><strong>Packet Sniffing:</strong> captura y análisis de paquetes que circulan sin cifrado adecuado por el espectro inalámbrico.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Mapa interactivo de amenazas</span>
+            <div class="visual-tabs" role="tablist" aria-label="Seleccionar amenaza Wi-Fi">
+              <button type="button" class="tab-btn is-selected" data-threat="rogue">Rogue AP</button>
+              <button type="button" class="tab-btn" data-threat="mitm">MitM</button>
+              <button type="button" class="tab-btn" data-threat="sniff">Sniffing</button>
+              <button type="button" class="tab-btn" data-threat="open">Wi-Fi Abierta</button>
+            </div>
+          </div>
+          <div class="studio-thumb-wrap">
+            <img src="assets/images/rogue_mitm.webp" alt="Ilustración 3D de un punto de acceso falso y un prisma interceptor Man-in-the-Middle" width="960" height="540" loading="lazy" />
+            <div class="studio-thumb-caption">
+              <span id="threat-badge-title">ROGUE ACCESS POINT</span>
+              <span>Vector activo</span>
+            </div>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 175" role="img" aria-label="Diagrama animado interactivo de ataques inalámbricos">
+              <!-- Victim Node -->
+              <rect x="24" y="48" width="110" height="68" rx="11" fill="#0d1d38" stroke="#38bdf8" stroke-width="1.6"/>
+              <text x="79" y="79" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Víctima</text>
+              <text x="79" y="97" text-anchor="middle" fill="#94a3b8" font-size="9.5">Usuario Wi-Fi</text>
+
+              <!-- Legit vs Attack routes -->
+              <path id="threat-path-1" class="anim-dash-fast" d="M 134 82 C 175 82, 185 82, 224 82" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="7 5"/>
+              <path id="threat-path-2" class="anim-dash-fast" d="M 336 82 C 375 82, 385 82, 426 82" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="7 5"/>
+
+              <!-- Middle Threat Node -->
+              <g class="anim-bob">
+                <rect x="224" y="40" width="112" height="84" rx="12" fill="#2a0d1c" stroke="#f43f5e" stroke-width="2"/>
+                <text id="threat-mid-top" x="280" y="68" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">ROGUE AP</text>
+                <text id="threat-mid-main" x="280" y="88" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="700">"WiFi_Gratis"</text>
+                <text id="threat-mid-sub" x="280" y="106" text-anchor="middle" fill="#f59e0b" font-size="9">Suplanta red oficial</text>
+              </g>
+
+              <!-- Destination Server -->
+              <rect x="426" y="48" width="110" height="68" rx="11" fill="#0d1d38" stroke="#818cf8" stroke-width="1.6"/>
+              <text x="481" y="79" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="700">Internet</text>
+              <text x="481" y="97" text-anchor="middle" fill="#94a3b8" font-size="9.5">Servicio Web</text>
+
+              <!-- Prevention Footer Strip -->
+              <rect x="14" y="135" width="532" height="28" rx="7" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-opacity="0.45"/>
+              <text id="threat-prev-text" x="280" y="152.5" text-anchor="middle" fill="#6ee7b7" font-family="JetBrains Mono, monospace" font-size="8.8">PREVENCIÓN: Verificar el nombre oficial y detectar puntos de acceso no autorizados.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 7 — DIAPOSITIVA 7: ATAQUES DE INTERRUPCIÓN Y ACCESO FORZADO
+         ====================================================================== -->
+    <section id="slide-7" class="slide" data-index="7" data-label="07 / 11 · INTERRUPCIÓN Y FUERZA BRUTA" data-theme="crimson">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">07 · Ataques en redes inalámbricas (Parte 2)</span>
+          <h2 class="slide-title" tabindex="-1">Desconexión forzada, fuerza bruta y saturación</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><circle cx="12" cy="20" r="1"/></svg>
+              </span>
+              <div class="point-body"><strong>Deauthentication:</strong> manipula tramas de administración para desconectar usuarios y forzarlos hacia una red falsa. Se mitiga con <strong>PMF (802.11w / WPA3)</strong>.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 12h2"/><path d="M11 12h2"/><path d="M15 12h2"/></svg>
+              </span>
+              <div class="point-body"><strong>Fuerza bruta:</strong> prueba miles de claves contra redes o paneles. Prevención: contraseñas largas, límite de intentos, bloqueo y <strong>MFA</strong>.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </span>
+              <div class="point-body"><strong>Denegación de servicio (DoS):</strong> interferencia o saturación que genera lentitud o caída total. Prevención: monitoreo y detección de anomalías.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Telemetría cinética en vivo</span>
+            <div class="visual-tabs" role="tablist" aria-label="Tipo de ataque a simular">
+              <button type="button" class="tab-btn is-selected" data-attack="dos">Saturación DoS</button>
+              <button type="button" class="tab-btn" data-attack="deauth">Deauth / PMF</button>
+              <button type="button" class="tab-btn" data-attack="brute">Fuerza Bruta</button>
+            </div>
+          </div>
+          <div class="diagram-box kinetic-canvas-wrap" id="kinetic-attack-wrap">
+            <canvas id="attacks-canvas" aria-label="Visualización animada en tiempo real de ataques DoS, Deauthentication y Fuerza Bruta"></canvas>
+          </div>
+          <div class="diagram-caption">
+            <span id="attack-caption-text">Saturación de canal: el tráfico malicioso colapsa la disponibilidad de la red inalámbrica.</span>
+            <button type="button" id="btn-toggle-defense" class="tab-btn">Activar defensa</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 8 — DIAPOSITIVA 8: PROTOCOLOS DE SEGURIDAD WI-FI
+         ====================================================================== -->
+    <section id="slide-8" class="slide" data-index="8" data-label="08 / 11 · PROTOCOLOS WI-FI" data-theme="emerald">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">08 · Evolución criptográfica</span>
+          <h2 class="slide-title" tabindex="-1">Protocolos de seguridad en redes inalámbricas</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              </span>
+              <div class="point-body"><strong>WEP (Obsoleto):</strong> primer estándar Wi-Fi, hoy vulnerable con facilidad; nunca debe utilizarse.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </span>
+              <div class="point-body"><strong>WPA (TKIP):</strong> transición frente a WEP; actualmente antiguo y desaconsejado en nuevas instalaciones.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <div class="point-body"><strong>WPA2 (AES-CCMP):</strong> estándar muy extendido y válido bien configurado, mientras exista transición de dispositivos.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              </span>
+              <div class="point-body"><strong>WPA3 (SAE + PMF):</strong> generación actual con autenticación más fuerte, tramas protegidas obligatorias y defensa contra ataques a contraseñas.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Comparador interactivo · WEP → WPA3</span>
+          </div>
+          <div class="studio-thumb-wrap">
+            <img src="assets/images/wpa3_evolution.webp" alt="Ilustración 3D de la evolución de los portales criptográficos desde WEP hasta WPA3" width="960" height="540" loading="lazy" />
+            <div class="studio-thumb-caption">
+              <span>Progresión de fortaleza criptográfica</span>
+              <span id="proto-meter-badge">WPA3 · 100% RECOMENDADO</span>
+            </div>
+          </div>
+
+          <div class="proto-strip" role="tablist" aria-label="Seleccionar protocolo Wi-Fi">
+            <button type="button" class="proto-card" data-proto="wep" style="--proto-col: #f43f5e;">
+              <div class="proto-name">WEP</div>
+              <div class="proto-tag">Obsoleto</div>
+              <div class="proto-bar"><span style="width: 16%"></span></div>
+            </button>
+            <button type="button" class="proto-card" data-proto="wpa" style="--proto-col: #f59e0b;">
+              <div class="proto-name">WPA</div>
+              <div class="proto-tag">TKIP · Antiguo</div>
+              <div class="proto-bar"><span style="width: 40%"></span></div>
+            </button>
+            <button type="button" class="proto-card" data-proto="wpa2" style="--proto-col: #38bdf8;">
+              <div class="proto-name">WPA2</div>
+              <div class="proto-tag">AES-CCMP</div>
+              <div class="proto-bar"><span style="width: 78%"></span></div>
+            </button>
+            <button type="button" class="proto-card is-selected" data-proto="wpa3" style="--proto-col: #10b981;">
+              <div class="proto-name">WPA3</div>
+              <div class="proto-tag">SAE + PMF</div>
+              <div class="proto-bar"><span style="width: 100%"></span></div>
+            </button>
+          </div>
+
+          <div class="proto-detail-box" id="proto-detail-box">
+            <strong style="color:#10b981;">WPA3 (Wi-Fi Protected Access 3):</strong> incorpora autenticación <strong>SAE</strong> en redes personales y <strong>Protected Management Frames (PMF)</strong> obligatorias, dificultando ataques por diccionario y desautenticación.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 9 — DIAPOSITIVA 9: MEDIDAS DE PREVENCIÓN Y PROTECCIÓN
+         ====================================================================== -->
+    <section id="slide-9" class="slide" data-index="9" data-label="09 / 11 · PREVENCIÓN Y DEFENSA" data-theme="emerald">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">09 · Defensa en profundidad</span>
+          <h2 class="slide-title" tabindex="-1">Medidas prácticas para proteger redes inalámbricas</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <div class="point-body"><strong>Cifrado y credenciales:</strong> usar <strong>WPA3 / WPA2-AES</strong>, contraseñas únicas robustas y cambiar usuario/clave de fábrica del router.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              </span>
+              <div class="point-body"><strong>Endurecimiento técnico:</strong> actualizar firmware/software periódicamente y desactivar funciones innecesarias o accesos remotos.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </span>
+              <div class="point-body"><strong>Firewall y segmentación:</strong> filtrar tráfico con firewall y separar redes independientes para <strong>empleados</strong>, <strong>visitantes</strong> y <strong>dispositivos IoT</strong>.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+              </span>
+              <div class="point-body"><strong>Monitoreo y capacitación:</strong> auditar equipos conectados, implementar detección de intrusos (WIDS) y formar a los usuarios.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Arquitectura animada · Firewall, VLANs &amp; Radar IDS</span>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 325" role="img" aria-label="Diagrama animado de firewall bloqueando amenazas, tres redes segmentadas y radar de detección de intrusos">
+              <!-- Incoming traffic -->
+              <rect x="16" y="114" width="90" height="86" rx="11" fill="#13182a" stroke="#94a3b8" stroke-opacity="0.45"/>
+              <text x="61" y="152" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="700">Tráfico</text>
+              <text x="61" y="169" text-anchor="middle" fill="#94a3b8" font-size="9.5">Entrante</text>
+
+              <!-- Threat deflected line -->
+              <path class="anim-dash-fast" d="M 106 132 L 182 132 L 154 74" fill="none" stroke="#f43f5e" stroke-width="2" stroke-dasharray="5 5"/>
+              <rect x="94" y="34" width="116" height="28" rx="7" fill="rgba(244,63,94,0.16)" stroke="#f43f5e" stroke-width="1.2"/>
+              <text x="152" y="52" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">BLOQUEADO</text>
+
+              <!-- Legit green flow into Firewall -->
+              <line class="anim-dash" x1="106" y1="164" x2="188" y2="164" stroke="#10b981" stroke-width="2.4" stroke-dasharray="6 5"/>
+
+              <!-- Firewall barrier -->
+              <rect x="188" y="76" width="84" height="176" rx="14" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="2.2"/>
+              <text x="230" y="148" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="700">FIREWALL</text>
+              <text x="230" y="166" text-anchor="middle" fill="#cbd5e1" font-size="9.5">WPA3 · Reglas</text>
+              <text x="230" y="182" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Actualizado</text>
+
+              <!-- Segmented paths to 3 VLANs -->
+              <path class="anim-dash" d="M 272 114 C 310 114, 315 62, 356 62" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6 5"/>
+              <path class="anim-dash" d="M 272 164 L 356 164" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="6 5"/>
+              <path class="anim-dash" d="M 272 214 C 310 214, 315 266, 356 266" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6 5"/>
+
+              <!-- 3 Isolated VLAN zones -->
+              <g transform="translate(356, 30)">
+                <rect width="184" height="64" rx="11" fill="#0b1f38" stroke="#38bdf8" stroke-width="1.6"/>
+                <text x="16" y="27" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">VLAN 10 · CORPORATIVA</text>
+                <text x="16" y="47" fill="#cbd5e1" font-size="10">Empleados y servidores internos</text>
+              </g>
+              <g transform="translate(356, 132)">
+                <rect width="184" height="64" rx="11" fill="#1b1236" stroke="#a855f7" stroke-width="1.6"/>
+                <text x="16" y="27" fill="#c084fc" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">VLAN 20 · VISITANTES</text>
+                <text x="16" y="47" fill="#cbd5e1" font-size="10">Solo Internet · Sin red interna</text>
+              </g>
+              <g transform="translate(356, 234)">
+                <rect width="184" height="64" rx="11" fill="#092723" stroke="#10b981" stroke-width="1.6"/>
+                <text x="16" y="27" fill="#34d399" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">VLAN 30 · DISPOSITIVOS IoT</text>
+                <text x="16" y="47" fill="#cbd5e1" font-size="10">Cámaras, impresoras y sensores</text>
+              </g>
+
+              <!-- Sweeping IDS Radar in lower-left -->
+              <g transform="translate(76, 266)">
+                <circle r="34" fill="rgba(16,185,129,0.08)" stroke="#10b981" stroke-opacity="0.55" stroke-width="1.4"/>
+                <circle r="20" fill="none" stroke="#10b981" stroke-opacity="0.3" stroke-width="1"/>
+                <path class="anim-radar" d="M 0 0 L 0 -32 A 32 32 0 0 1 26 -18 Z" fill="rgba(16,185,129,0.35)"/>
+                <circle r="3.5" fill="#34d399"/>
+                <text x="0" y="47" text-anchor="middle" fill="#6ee7b7" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">DETECCIÓN IDS</text>
+              </g>
+            </svg>
+          </div>
+          <p class="diagram-caption">
+            <span>La seguridad efectiva combina múltiples capas técnicas junto con la capacitación continua de los usuarios.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 10 — DIAPOSITIVA 10: IMPORTANCIA EN EMPRESAS Y ORGANIZACIONES
+         ====================================================================== -->
+    <section id="slide-10" class="slide" data-index="10" data-label="10 / 11 · EMPRESAS Y ORGANIZACIONES" data-theme="gold">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">10 · Impacto organizacional</span>
+          <h2 class="slide-title" tabindex="-1">Importancia en empresas e instituciones</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+              </span>
+              <div class="point-body"><strong>Información confidencial:</strong> empresas e instituciones educativas resguardan bases de datos, sistemas administrativos y expedientes críticos.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+              </span>
+              <div class="point-body"><strong>Costo de una brecha:</strong> acceso no autorizado provoca interrupción operativa, filtración comercial, pérdidas económicas y daño reputacional.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              </span>
+              <div class="point-body"><strong>Gestión continua:</strong> políticas formales, evaluaciones de vulnerabilidades, inventario de red, <strong>respuesta a incidentes</strong> y <strong>copias de seguridad</strong>.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Ciclo de Resiliencia Organizacional</span>
+          </div>
+          <div class="studio-thumb-wrap">
+            <img src="assets/images/enterprise_campus.webp" alt="Ilustración 3D de un campus corporativo y educativo bajo una cúpula de seguridad" width="960" height="540" loading="lazy" />
+            <div class="studio-thumb-caption">
+              <span>Empresas · Universidades · Instituciones</span>
+              <span>Continuidad operativa</span>
+            </div>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 190" role="img" aria-label="Ciclo continuo de seguridad organizacional de cinco fases">
+              <!-- Continuous loop connector -->
+              <rect x="46" y="42" width="468" height="106" rx="53" fill="none" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="7 5" class="anim-dash"/>
+
+              <!-- Top 3 steps -->
+              <g transform="translate(86, 20)">
+                <rect width="120" height="44" rx="10" fill="#0c1f3a" stroke="#38bdf8" stroke-width="1.5"/>
+                <text x="60" y="20" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">01 · GOBIERNO</text>
+                <text x="60" y="35" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Políticas claras</text>
+              </g>
+              <g transform="translate(220, 20)">
+                <rect width="120" height="44" rx="10" fill="#0b2434" stroke="#14b8a6" stroke-width="1.5"/>
+                <text x="60" y="20" text-anchor="middle" fill="#2dd4bf" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">02 · AUDITORÍA</text>
+                <text x="60" y="35" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Evaluaciones</text>
+              </g>
+              <g transform="translate(354, 20)">
+                <rect width="120" height="44" rx="10" fill="#092823" stroke="#10b981" stroke-width="1.5"/>
+                <text x="60" y="20" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">03 · CONTROL</text>
+                <text x="60" y="35" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Inventario activo</text>
+              </g>
+
+              <!-- Center Protected Entities Badge -->
+              <rect x="190" y="80" width="180" height="30" rx="15" fill="rgba(251,191,36,0.12)" stroke="#fbbf24" stroke-opacity="0.55"/>
+              <text x="280" y="99" text-anchor="middle" fill="#fde68a" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">DATOS Y SERVICIOS PROTEGIDOS</text>
+
+              <!-- Bottom 2 steps -->
+              <g transform="translate(132, 126)">
+                <rect width="142" height="44" rx="10" fill="#1c1934" stroke="#fbbf24" stroke-width="1.5"/>
+                <text x="71" y="20" text-anchor="middle" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">05 · RECUPERACIÓN</text>
+                <text x="71" y="35" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Copias de seguridad</text>
+              </g>
+              <g transform="translate(292, 126)">
+                <rect width="142" height="44" rx="10" fill="#1f152c" stroke="#818cf8" stroke-width="1.5"/>
+                <text x="71" y="20" text-anchor="middle" fill="#a5b4fc" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">04 · CONTENCIÓN</text>
+                <text x="71" y="35" text-anchor="middle" fill="#f8fafc" font-size="10.5" font-weight="600">Respuesta a incidentes</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SCROLL 11 — DIAPOSITIVA FINAL: CONCLUSIÓN
+         ====================================================================== -->
+    <section id="slide-11" class="slide" data-index="11" data-label="CONCLUSIÓN" data-theme="gold">
+      <div class="slide-inner slide-grid">
+        <div class="slide-copy">
+          <span class="slide-kicker">Cierre · Conclusión</span>
+          <h2 class="slide-title" tabindex="-1">Conclusión</h2>
+          <ul class="points-list">
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </span>
+              <div class="point-body"><strong>Riesgo real y constante:</strong> aunque Wi-Fi brinda movilidad y comodidad, claves débiles, malas configuraciones, redes abiertas o ataques como Rogue AP y DoS exponen la red.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              </span>
+              <div class="point-body"><strong>Protección combinada:</strong> asegurar una red exige protocolos modernos (<strong>WPA2 / WPA3</strong>), firewalls, actualizaciones, control de acceso y supervisión constante.</div>
+            </li>
+            <li class="point-card">
+              <span class="point-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <div class="point-body"><strong>Tecnología + cultura:</strong> la seguridad informática depende tanto de los equipos como del <strong>comportamiento de los usuarios</strong> y las <strong>políticas organizacionales</strong>.</div>
+            </li>
+          </ul>
+
+          <div class="cia-pills" aria-label="Pilares garantizados">
+            <span class="cia-pill">Confidencialidad</span>
+            <span class="cia-pill cia-pill--emerald">Integridad</span>
+            <span class="cia-pill cia-pill--gold">Disponibilidad</span>
+          </div>
+
+          <div class="conclusion-actions">
+            <button type="button" class="btn-primary" data-goto="0">
+              <span>Volver a la portada</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-header">
+            <span class="visual-label">Síntesis · Núcleo Unificado de Seguridad</span>
+          </div>
+          <div class="diagram-box">
+            <svg class="diagram-svg" viewBox="0 0 560 320" role="img" aria-label="Diagrama animado de tres anillos concéntricos de tecnología, políticas y usuarios protegiendo la tríada CIA">
+              <g transform="translate(280, 160)">
+                <!-- Outer Ring: Cultura y Usuarios -->
+                <circle class="anim-spin-slow" r="126" fill="none" stroke="#fbbf24" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="14 8"/>
+                <!-- Middle Ring: Políticas y Mantenimiento -->
+                <circle class="anim-spin-rev" r="92" fill="none" stroke="#10b981" stroke-opacity="0.7" stroke-width="2.2" stroke-dasharray="10 6"/>
+                <!-- Inner Ring: Tecnología WPA2/WPA3 -->
+                <circle class="anim-spin" r="60" fill="none" stroke="#38bdf8" stroke-opacity="0.85" stroke-width="2.4" stroke-dasharray="8 5"/>
+
+                <!-- Core CIA Shield -->
+                <circle r="46" fill="#091a34" stroke="#38bdf8" stroke-width="2.4"/>
+                <text x="0" y="-4" text-anchor="middle" fill="#f8fafc" font-family="Space Grotesk, sans-serif" font-size="11.5" font-weight="700">RED SEGURA</text>
+                <text x="0" y="14" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">C · I · A</text>
+
+                <!-- Orbiting Badges -->
+                <g transform="translate(0, -126)">
+                  <rect x="-78" y="-15" width="156" height="30" rx="15" fill="#1e1a0c" stroke="#fbbf24" stroke-width="1.5"/>
+                  <text x="0" y="4" text-anchor="middle" fill="#fde68a" font-size="10.5" font-weight="700">Usuarios y Prevención</text>
+                </g>
+                <g transform="translate(-148, 56)">
+                  <rect x="-72" y="-15" width="144" height="30" rx="15" fill="#08241d" stroke="#10b981" stroke-width="1.5"/>
+                  <text x="0" y="4" text-anchor="middle" fill="#6ee7b7" font-size="10.5" font-weight="700">Políticas y Parches</text>
+                </g>
+                <g transform="translate(148, 56)">
+                  <rect x="-74" y="-15" width="148" height="30" rx="15" fill="#091e36" stroke="#38bdf8" stroke-width="1.5"/>
+                  <text x="0" y="4" text-anchor="middle" fill="#bae6fd" font-size="10.5" font-weight="700">WPA3 · Firewall · IDS</text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <p class="diagram-caption">
+            <span>Joshua Flores · Rogelio Miranda — Vulnerabilidades en los servicios y seguridad en redes inalámbricas</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       NATIVE LIGHT-DISMISS DIALOG: ÍNDICE RÁPIDO
+       ======================================================================== -->
+  <dialog id="outline-dialog" class="cyber-dialog" closedby="any" aria-labelledby="outline-title">
+    <div class="dialog-head">
+      <h2 id="outline-title">Índice de diapositivas</h2>
+      <form method="dialog">
+        <button type="submit" class="dialog-close">Cerrar (Esc)</button>
+      </form>
+    </div>
+    <div class="outline-grid">
+      <button type="button" class="outline-item" data-goto="0"><span class="outline-num">00</span><span class="outline-name">Portada</span></button>
+      <button type="button" class="outline-item" data-goto="1"><span class="outline-num">01</span><span class="outline-name">Introducción</span></button>
+      <button type="button" class="outline-item" data-goto="2"><span class="outline-num">02</span><span class="outline-name">¿Qué son las vulnerabilidades?</span></button>
+      <button type="button" class="outline-item" data-goto="3"><span class="outline-num">03</span><span class="outline-name">Acceso y configuración</span></button>
+      <button type="button" class="outline-item" data-goto="4"><span class="outline-num">04</span><span class="outline-name">Sistemas y cifrado</span></button>
+      <button type="button" class="outline-item" data-goto="5"><span class="outline-num">05</span><span class="outline-name">Seguridad en redes inalámbricas</span></button>
+      <button type="button" class="outline-item" data-goto="6"><span class="outline-num">06</span><span class="outline-name">Amenazas e intercepción Wi-Fi</span></button>
+      <button type="button" class="outline-item" data-goto="7"><span class="outline-num">07</span><span class="outline-name">Deauth, fuerza bruta y DoS</span></button>
+      <button type="button" class="outline-item" data-goto="8"><span class="outline-num">08</span><span class="outline-name">Protocolos WEP → WPA3</span></button>
+      <button type="button" class="outline-item" data-goto="9"><span class="outline-num">09</span><span class="outline-name">Medidas de prevención</span></button>
+      <button type="button" class="outline-item" data-goto="10"><span class="outline-num">10</span><span class="outline-name">Empresas y organizaciones</span></button>
+      <button type="button" class="outline-item" data-goto="11"><span class="outline-num">11</span><span class="outline-name">Conclusión</span></button>
+    </div>
+  </dialog>
+
+  <script src="js/diagrams.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "presentacion-redes-inalambricas",
+  "version": "1.0.0",
+  "description": "Presentación web interactiva controlada por scroll con video de fondo generado con Gemini Omni 1.2 Flash convertido en frames y diagramas animados sobre vulnerabilidades en los servicios y seguridad en redes inalámbricas.",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "generate-video": "node scripts/generate_omni_video.mjs"
+  },
+  "devDependencies": {
+    "@google/genai": "^3.6.1",
+    "ws": "^8.19.0"
+  }
+}
